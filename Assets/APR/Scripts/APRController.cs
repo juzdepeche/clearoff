@@ -2,24 +2,14 @@
 using UnityEngine;
 using System.Linq;
 
-public class APRController : MonoBehaviour
+public class APRController : ControllerHandler
 {
     [Header("Input On this Player")]
     //Enable controls
     public bool useControls;
-    
+    public float damping = 15f;
     [Header("Input Keys")]
     //Player input controls
-    public string moveForward = "w";
-    public string moveBackward = "s";
-    public string turnRight = "d";
-    public string turnLeft = "a";
-    public string jumpGetup = "space";
-    public string punchRight = "e";
-    public string punchLeft = "q";
-    public string reachRight = "p";
-    public string reachLeft = "o";
-    public string pickupThrow = "f";
     
     [Header("The Layer Only This Player Is On")]
     //Player Layer
@@ -205,75 +195,73 @@ public class APRController : MonoBehaviour
 	}
 	
 	
+	public void SetTargetRotation(ConfigurableJoint cj, Quaternion startRot, Quaternion target, Space space)
+	{
+		Vector3 right = cj.axis;
+		Vector3 forward = Vector3.Cross(cj.axis, cj.secondaryAxis).normalized;
+		Vector3 up = Vector3.Cross(forward, right).normalized;
+		Quaternion localToJointSpace = Quaternion.LookRotation(forward, up);
+		if (space == Space.World)
+		{
+			Quaternion worldToLocal = Quaternion.Inverse(cj.transform.parent.rotation);
+			target = worldToLocal * target;
+		}
+		cj.targetRotation = Quaternion.Inverse(localToJointSpace) * Quaternion.Inverse(target) * startRot * localToJointSpace;
+	}
+
 	////////////////
 	//Input Controls
 	////////////////
 	void InputControls()
 	{
-        //Walk forward
-        if (Input.GetKey(moveForward) && balanced && !KnockedOut)
+        //Walk forward / backward
+        if (balanced && !KnockedOut)
         {
-            var v3 = APR_Parts[0].GetComponent<Rigidbody>().transform.forward * MoveSpeed;
-            v3.y = APR_Parts[0].GetComponent<Rigidbody>().velocity.y;
-            APR_Parts[0].GetComponent<Rigidbody>().velocity = v3;
-            WalkForward = true;
-            isKeyDown = true;
+			var xAxis = getAxis()[0];
+			var x = Camera.main.transform.right * MoveSpeed * xAxis;
+
+			var yAxis = getAxis()[1];
+            var y = Camera.main.transform.forward * MoveSpeed * yAxis;
+
+			var movement = (x + y);
+            APR_Parts[0].GetComponent<Rigidbody>().velocity = movement;
+
+
+			if (xAxis != 0 && yAxis != 0)
+			{
+				var lookPos = movement;
+				lookPos.y = 0;
+				var rotation = Quaternion.LookRotation(lookPos);
+				APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Lerp(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation, Quaternion.Inverse(rotation), Time.deltaTime * damping);
+			}
+
+			if (yAxis > 0)
+			{
+				WalkForward = true;
+            	isKeyDown = true;
+			}
+			
+			if (yAxis < 0)
+			{
+				WalkBackward = true;
+            	isKeyDown = true;
+			}
         }
 		
-        if(Input.GetKeyUp(moveForward))
-        {
-            WalkForward = false;
-            isKeyDown = false;
-        }
-		
-        
-        
-        //Walk backward
-        if (Input.GetKey(moveBackward) && balanced && !KnockedOut)
-        {
-            var v3 = - APR_Parts[0].GetComponent<Rigidbody>().transform.forward * MoveSpeed;
-            v3.y = APR_Parts[0].GetComponent<Rigidbody>().velocity.y;
-            APR_Parts[0].GetComponent<Rigidbody>().velocity = v3;
-            WalkBackward = true;
-            isKeyDown = true;
-        }
-		
-        if(Input.GetKeyUp(moveBackward))
+        if(moveBackwardReleased())
         {
             WalkBackward = false;
             isKeyDown = false;
         }
-		
-        
-        
-        //Turn right
-        if (Input.GetKey(turnRight) && balanced && !KnockedOut)
+
+		if(moveForwardReleased())
         {
-            APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Lerp(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation, new Quaternion(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.x,APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.y - turnSpeed, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.z, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.w), 6 * Time.fixedDeltaTime);
+            WalkForward = false;
+            isKeyDown = false;
         }
-		
-        //Turn left
-        if (Input.GetKey(turnLeft) && balanced && !KnockedOut)
-        {
-            APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Lerp(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation, new Quaternion(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.x,APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.y + turnSpeed, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.z, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.w), 6 * Time.fixedDeltaTime);
-        }
-		
-		
-        //reset turn upon target rotation limit
-        if(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.y < -0.98f)
-        {
-            APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.x, 0.98f, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.z, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.w);
-        }
-			
-        else if(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.y > 0.98f)
-        {
-            APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.x, -0.98f, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.z, APR_Parts[0].GetComponent<ConfigurableJoint>().targetRotation.w);
-        }
-        
-        
         
         //Get up
-        if(Input.GetKeyDown(jumpGetup) && !balanced && !isJumping)
+        if(jumpGetupPressed() && !balanced && !isJumping)
         {
             GettingUp = true;
             balanced = true;
@@ -287,7 +275,7 @@ public class APRController : MonoBehaviour
         
         
         //Jump
-        else if(Input.GetKeyDown(jumpGetup) && balanced && !inAir && !Jump && !KnockedOut)
+        else if(jumpGetupReleased() && balanced && !inAir && !Jump && !KnockedOut)
         {
             Jump = true;
             Grounded = false;
@@ -299,12 +287,12 @@ public class APRController : MonoBehaviour
             
             
         //Reach Left
-        if(Input.GetKeyDown(reachLeft) && !KnockedOut)
+        if(reachLeftPressed() && !KnockedOut)
         {
             ReachingLeft = true;
         }
             
-        if(Input.GetKeyUp(reachLeft) && !KnockedOut)
+        if(reachLeftReleased() && !KnockedOut)
         {
             ReachingLeft = false;
             PickedUp = false;
@@ -313,12 +301,12 @@ public class APRController : MonoBehaviour
             
             
         //Reach Right
-        if(Input.GetKeyDown(reachRight) && !KnockedOut)
+        if(reachRightPressed() && !KnockedOut)
         {
             ReachingRight = true;
         }
             
-        if(Input.GetKeyUp(reachRight) && !KnockedOut)
+        if(reachRightReleased() && !KnockedOut)
         {
              ReachingRight = false;
              PickedUp = false;
@@ -327,7 +315,7 @@ public class APRController : MonoBehaviour
         
         
         //Pick up left helper
-        if(Input.GetKey(reachLeft) && ReachingLeft && GrabLeft.hasJoint && !KnockedOut)
+        if(reachLeftPressed() && ReachingLeft && GrabLeft.hasJoint && !KnockedOut)
         {
             if(GrabLeft.GetComponent<FixedJoint>() != null)
             {
@@ -341,11 +329,16 @@ public class APRController : MonoBehaviour
                     GrabLeft.GetComponent<Rigidbody>().AddForce(APR_Parts[0].transform.up * GrabLeft.GetComponent<FixedJoint>().connectedBody.mass * 5);
                 }
 
+				else if(GrabLeft.GetComponent<FixedJoint>().connectedBody.gameObject.tag == "Heavy Object")
+				{
+					GrabLeft.GetComponent<Rigidbody>().AddForce(APR_Parts[0].transform.up * GrabLeft.GetComponent<FixedJoint>().connectedBody.mass);
+				}
+
             }
         }
         
         //Pick up right helper
-        if(Input.GetKey(reachRight) && ReachingRight && GrabRight.hasJoint && !KnockedOut)
+        if(reachRightPressed() && ReachingRight && GrabRight.hasJoint && !KnockedOut)
         {
             if(GrabRight.GetComponent<FixedJoint>() != null)
             {
@@ -358,18 +351,23 @@ public class APRController : MonoBehaviour
                 {
                     GrabRight.GetComponent<Rigidbody>().AddForce(APR_Parts[0].transform.up * GrabRight.GetComponent<FixedJoint>().connectedBody.mass * 5);
                 }
+
+				else if(GrabRight.GetComponent<FixedJoint>().connectedBody.gameObject.tag == "Heavy Object")
+				{
+					GrabRight.GetComponent<Rigidbody>().AddForce(APR_Parts[0].transform.up * GrabRight.GetComponent<FixedJoint>().connectedBody.mass);
+				}
             }
         }
         
         //Pickup and Throw
-        if(Input.GetKeyDown(pickupThrow) && !PickedUp && !KnockedOut)
+        if(pickupThrowPressed() && !PickedUp && !KnockedOut)
         {
             PickedUp = true;
             GrabbedLeft = null;
             GrabbedRight = null;
         }
         
-        else if(Input.GetKeyDown(pickupThrow) && PickedUp && !KnockedOut)
+        else if(pickupThrowPressed() && PickedUp && !KnockedOut)
         {
             //Let go left
             if(GrabLeft.hasJoint)
@@ -428,13 +426,13 @@ public class APRController : MonoBehaviour
 
             
         //punch
-        if(Input.GetKeyDown(punchRight) && !KnockedOut)
+        if(punchRightPressed() && !KnockedOut)
         {
             Punching = true;
             PunchRight();
         }
             
-        if(Input.GetKeyDown(punchLeft) && !KnockedOut)
+        if(punchLeftPressed() && !KnockedOut)
         {
             Punching = true;
             PunchLeft();

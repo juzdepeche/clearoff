@@ -17,7 +17,7 @@ public class HandController : MonoBehaviour
             //On key release destroy joint
             if(Left)
             {
-                if(hasJoint && Input.GetKeyUp(APR_Player.reachLeft))
+                if(hasJoint && APR_Player.reachLeftReleased())
                 {
                     this.gameObject.GetComponent<FixedJoint>().breakForce = 0;
                     hasJoint = false;
@@ -35,7 +35,7 @@ public class HandController : MonoBehaviour
             //On key release destroy joint
             if(!Left)
             {
-                if(hasJoint && Input.GetKeyUp(APR_Player.reachRight))
+                if(hasJoint && APR_Player.reachRightReleased())
                 {
                     this.gameObject.GetComponent<FixedJoint>().breakForce = 0;
                     hasJoint = false;
@@ -59,9 +59,9 @@ public class HandController : MonoBehaviour
             //Left Hand
             if(Left)
             {
-                if(col.gameObject.tag == "Object" && !hasJoint)
+                if((col.gameObject.tag == "Object" || col.gameObject.tag == "Heavy Object") && !hasJoint)
                 {
-                    if(Input.GetKey(APR_Player.reachLeft) && !hasJoint)
+                    if(APR_Player.reachLeftPressed() && !hasJoint)
                     {
                         hasJoint = true;
                         hasWaitedAfterThrow = false;
@@ -73,7 +73,7 @@ public class HandController : MonoBehaviour
                 
                 else if(col.gameObject.tag == "Player" && col.gameObject.layer != LayerMask.NameToLayer(APR_Player.thisPlayerLayer) && !hasJoint)
                 {
-                    if(Input.GetKey(APR_Player.reachLeft) && !hasJoint)
+                    if(APR_Player.reachLeftPressed() && !hasJoint)
                     {
                         hasJoint = true;
                         hasWaitedAfterThrow = false;
@@ -87,9 +87,9 @@ public class HandController : MonoBehaviour
             //Right Hand
             if(!Left)
             {
-                if(col.gameObject.tag == "Object" && !hasJoint)
+                if((col.gameObject.tag == "Object" || col.gameObject.tag == "Heavy Object") && !hasJoint)
                 {
-                    if(Input.GetKey(APR_Player.reachRight) && !hasJoint)
+                    if(APR_Player.reachRightPressed() && !hasJoint)
                     {
                         hasJoint = true;
                         hasWaitedAfterThrow = false;
@@ -101,7 +101,7 @@ public class HandController : MonoBehaviour
                 
                 if(col.gameObject.tag == "Player" && col.gameObject.layer != LayerMask.NameToLayer(APR_Player.thisPlayerLayer) && !hasJoint)
                 {
-                    if(Input.GetKey(APR_Player.reachRight) && !hasJoint)
+                    if(APR_Player.reachRightPressed() && !hasJoint)
                     {
                         hasJoint = true;
                         hasWaitedAfterThrow = false;
