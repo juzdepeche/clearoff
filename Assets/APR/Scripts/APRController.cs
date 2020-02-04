@@ -168,7 +168,7 @@ public class APRController : ControllerHandler
     void Update()
     {
     
-        if(useControls)
+        if(useControls && IsInitialized)
         {
             InputControls();
             

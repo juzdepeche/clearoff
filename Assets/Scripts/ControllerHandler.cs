@@ -5,19 +5,22 @@ using UnityEngine;
 
 public class ControllerHandler : MonoBehaviour
 {
-    public InputDevice InputDevice;
-    // Start is called before the first frame update
-    void Start()
+    protected InputDevice Device;
+    public bool IsInitialized = false;
+
+    public void SetDevice(InputDevice device)
     {
-        foreach (var device in InputManager.Devices) {
-            InputDevice = device;
-        }
+        Device = device; 
     }
 
-    // Update is called once per frame
-    void Update()
+    public InputDevice GetDevice()
     {
-        
+        return Device;
+    }
+
+    public void Initialize()
+    {
+        IsInitialized = true;
     }
 
     public float[] getAxis() {
@@ -25,10 +28,10 @@ public class ControllerHandler : MonoBehaviour
         axis[0] = 0;
         axis[1] = 0;
 
-        if (InputDevice != null)
+        if (Device != null)
         {
-            axis[0] = InputDevice.LeftStickX;
-            axis[1] = InputDevice.LeftStickY;
+            axis[0] = Device.LeftStickX;
+            axis[1] = Device.LeftStickY;
         }
 
         return axis;
@@ -84,61 +87,61 @@ public class ControllerHandler : MonoBehaviour
 
     public bool jumpGetupPressed()
     {
-        return InputDevice.Action1.WasPressed;
+        return Device.Action1.WasPressed;
     }
 
     public bool jumpGetupReleased()
     {
-        return InputDevice.Action1.WasReleased;
+        return Device.Action1.WasReleased;
     }
 
     public bool punchRightPressed()
     {
-        return InputDevice.RightTrigger.WasPressed;
+        return Device.RightTrigger.WasPressed;
     }
 
     public bool punchRightReleased()
     {
-        return InputDevice.RightTrigger.WasReleased;
+        return Device.RightTrigger.WasReleased;
     }
 
     public bool punchLeftPressed()
     {
-        return InputDevice.LeftTrigger.WasPressed;
+        return Device.LeftTrigger.WasPressed;
     }
 
     public bool punchLeftReleased()
     {
-        return InputDevice.LeftTrigger.WasReleased;
+        return Device.LeftTrigger.WasReleased;
     }
 
     public bool reachRightPressed()
     {
-        return InputDevice.RightBumper.IsPressed;
+        return Device.RightBumper.IsPressed;
     }
 
     public bool reachRightReleased()
     {
-        return InputDevice.RightBumper.WasReleased;
+        return Device.RightBumper.WasReleased;
     }
 
     public bool reachLeftPressed()
     {
-        return InputDevice.LeftBumper.IsPressed;
+        return Device.LeftBumper.IsPressed;
     }
 
     public bool reachLeftReleased()
     {
-        return InputDevice.LeftBumper.WasReleased;
+        return Device.LeftBumper.WasReleased;
     }
 
     public bool pickupThrowPressed()
     {
-        return InputDevice.Action4.WasPressed;
+        return Device.Action4.WasPressed;
     }
 
     public bool pickupThrowReleased()
     {
-        return InputDevice.Action4.WasReleased;
+        return Device.Action4.WasReleased;
     }
 }

@@ -11,7 +11,7 @@ public class HandController : MonoBehaviour
 
     void Update()
     {
-        if(APR_Player.useControls)
+        if(APR_Player.useControls && APR_Player.IsInitialized)
         {
             //Left Hand
             //On key release destroy joint
@@ -54,7 +54,7 @@ public class HandController : MonoBehaviour
     //Grab on collision
     void OnCollisionEnter(Collision col)
     {
-        if(APR_Player.useControls && hasWaitedAfterThrow)
+        if(APR_Player.useControls && APR_Player.IsInitialized && hasWaitedAfterThrow)
         {
             //Left Hand
             if(Left)
