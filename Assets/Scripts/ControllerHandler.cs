@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using InControl;
 using UnityEngine;
 
-public class ControllerHandler : MonoBehaviour
+public class ControllerHandler : Player
 {
     protected InputDevice Device;
     public bool IsInitialized = false;

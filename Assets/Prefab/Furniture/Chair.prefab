@@ -312,6 +312,7 @@ GameObject:
   - component: {fileID: 2792587534917659474}
   - component: {fileID: 4380877617602014252}
   - component: {fileID: 7473319954565967884}
+  - component: {fileID: 2256918754942506727}
   m_Layer: 0
   m_Name: Chair
   m_TagString: Object
@@ -411,8 +412,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StartHealth: 100
-  DammageForce: 10
-  DammageByPlayerForce: 50
+  DamageByEnvironmentForce: 15
+  DamageByEnvironmentDone: 10
+  DamageByPlayerForce: 50
+  DamageByPlayerDone: 15
   Impacts:
   - {fileID: 8300000, guid: 9cedbd6c3a489e54aa7506141a18b394, type: 3}
   - {fileID: 8300000, guid: 6dd4792fb4deae349854fac9bebc9637, type: 3}
@@ -515,3 +518,16 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!65 &2256918754942506727
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6188137784343802460}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.02296544, y: 0.020976648, z: 0.33143535}
+  m_Center: {x: 0, y: -0.0012079625, z: 0.027371053}

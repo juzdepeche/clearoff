@@ -331,6 +331,8 @@ public class APRController : ControllerHandler
 
 				else if(GrabLeft.GetComponent<FixedJoint>().connectedBody.gameObject.tag == "Heavy Object")
 				{
+					var test = GrabLeft.GetComponent<FixedJoint>();
+					Debug.Log(test.connectedBody.gameObject);
 					GrabLeft.GetComponent<Rigidbody>().AddForce(APR_Parts[0].transform.up * GrabLeft.GetComponent<FixedJoint>().connectedBody.mass);
 				}
 

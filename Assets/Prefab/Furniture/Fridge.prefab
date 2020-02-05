@@ -220,10 +220,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StartHealth: 100
-  DammageForce: 15
-  DammageByPlayerForce: 50
+  DamageByEnvironmentForce: 15
+  DamageByEnvironmentDone: 10
+  DamageByPlayerForce: 50
+  DamageByPlayerDone: 15
   Impacts:
   - {fileID: 8300000, guid: 0bf45e6edbcdc074e8ab2dd8336ea7de, type: 3}
   Hits:
   - {fileID: 8300000, guid: c1c98af1e4c42c04981a2a633dc544ba, type: 3}
-  SoundSource: {fileID: 0}
+  SoundSource: {fileID: 334193373833612560}
+  SparkParticles: {fileID: 4463138257762805243, guid: 14b035a97f6345f46910dd9ef2daba4a,
+    type: 3}

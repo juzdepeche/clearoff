@@ -11,11 +11,17 @@ public class GameController : MonoBehaviour
     public List<InputDevice> Devices;
     public Transform SpawnPoint;
     
+    public List<Team> Teams;
+
     private void Awake() {
-        if(Instance != null)
+        if(Instance == null)
         {
             Instance = this;
-        }    
+        }
+        
+        // team will be created before this script 
+        Teams = new List<Team>();
+        Teams.Add(new Team()); 
     }
 
     void Start()
@@ -80,5 +86,10 @@ public class GameController : MonoBehaviour
         }
 
         return freePlayer;
+    }
+
+    public int GetTeamCount()
+    {
+        return Teams.Count;
     }
 }

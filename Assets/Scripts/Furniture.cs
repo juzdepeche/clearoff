@@ -5,19 +5,23 @@ using UnityEngine;
 public class Furniture : MonoBehaviour
 {
     [Header("Health")]
-    public float StartHealth = 100f;
-    private float CurrentHealth;
+    public int StartHealth = 100;
+    private int CurrentHealth;
 
-    [Header("Dammages")]
-    public float DammageByEnvironmentForce = 15f;
-    public float DammageByEnvironmentDone = 10f;
-    public float DammageByPlayerForce = 50f;
-    public float DammageByPlayerDone = 15f;
+    [Header("Damages")]
+    public int DamageByEnvironmentForce = 15;
+    public int DamageByEnvironmentDone = 10;
+    public int DamageByPlayerForce = 50;
+    public int DamageByPlayerDone = 15;
 
     [Header("Audio")]
     public AudioClip[] Impacts;
     public AudioClip[] Hits;
     public AudioSource SoundSource;
+
+    public ParticleSystem SparkParticles;
+
+    List<Player> hookedPlayers;
 
     enum SoundType
     {
@@ -27,25 +31,32 @@ public class Furniture : MonoBehaviour
 
     private void Start() {
         CurrentHealth = StartHealth;
+        hookedPlayers = new List<Player>();
     }
 
     void OnCollisionEnter(Collision col)
 	{
-        if (col.collider.tag == "Player" && col.relativeVelocity.magnitude >= DammageByPlayerForce) 
+        if (col.collider.tag == "Player" && col.relativeVelocity.magnitude >= DamageByPlayerForce) 
         {
-            Debug.Log(col.relativeVelocity.magnitude);
-            Dammage(DammageByPlayerDone, SoundType.Hit);
+            Damage(DamageByPlayerDone, SoundType.Hit);
+            Spark(col.transform);
         }
-		else if(col.collider.tag != "Player" && col.relativeVelocity.magnitude >= DammageByEnvironmentForce)
+		else if(col.collider.tag != "Player" && col.relativeVelocity.magnitude >= DamageByEnvironmentForce)
 		{
-            Dammage(DammageByEnvironmentDone, SoundType.Impact);
+            Damage(DamageByEnvironmentDone, SoundType.Impact);
+            Spark(col.transform);
 		}
     }
 
-    private void Dammage(float dammageDone, SoundType soundType) 
+    private void Damage(int DamageDone, SoundType soundType) 
     {
-        CurrentHealth -= dammageDone;
+        CurrentHealth -= DamageDone;
         PlaySound(soundType);
+    }
+
+    private void Spark(Transform position)
+    {
+        Instantiate(SparkParticles, position);
     }
 
     private void PlaySound(SoundType soundType) 
@@ -69,8 +80,9 @@ public class Furniture : MonoBehaviour
         }
     }
 
-    public float GetPoints()
+    public int GetPoints()
     {
-        return GetComponent<Rigidbody>().mass * (CurrentHealth / StartHealth);
+        var mass = (int) GetComponent<Rigidbody>().mass;
+        return mass * (CurrentHealth / StartHealth);
     }
 }
