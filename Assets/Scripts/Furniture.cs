@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ public class Furniture : MonoBehaviour
     [Header("Health")]
     public int StartHealth = 100;
     private int CurrentHealth;
+
+    public int PoseValue = 0;
 
     [Header("Damages")]
     public int DamageByEnvironmentForce = 15;
@@ -20,6 +23,8 @@ public class Furniture : MonoBehaviour
     public AudioSource SoundSource;
 
     public ParticleSystem SparkParticles;
+
+    public bool HasBeenRewarded = false;
 
     List<Player> hookedPlayers;
 
@@ -48,6 +53,17 @@ public class Furniture : MonoBehaviour
 		}
     }
 
+    public void Pose(int value)
+    {
+        HasBeenRewarded = true;
+        PoseValue = value;
+    }
+
+    public void Dispose()
+    {
+        HasBeenRewarded = false;
+    }
+
     private void Damage(int DamageDone, SoundType soundType) 
     {
         CurrentHealth -= DamageDone;
@@ -74,7 +90,7 @@ public class Furniture : MonoBehaviour
         
         if(SoundLibrary != null && !SoundSource.isPlaying)
         {
-            int i = Random.Range(0, SoundLibrary.Length);
+            int i = UnityEngine.Random.Range(0, SoundLibrary.Length);
             SoundSource.clip = SoundLibrary[i];
             SoundSource.Play();
         }
